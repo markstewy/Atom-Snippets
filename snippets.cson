@@ -1,0 +1,817 @@
+# Your snippets
+#
+# Atom snippets allow you to enter a simple prefix in the editor and hit tab to
+# expand the prefix into a larger code block with templated values.
+#
+# You can create a new snippet in this file by typing "snip" and then hitting
+# tab.
+#
+# An example CoffeeScript snippet to expand log to console.log:
+#
+# '.source.coffee':
+#   'Console log':
+#     'prefix': 'log'
+#     'body': 'console.log $1'
+#
+# Each scope (e.g. '.source.coffee' above) can only be declared once.
+#
+# This file uses CoffeeScript Object Notation (CSON).
+# If you are unfamiliar with CSON, you can read more about it in the
+# Atom Flight Manual:
+# https://atom.io/docs/latest/using-atom-basic-customization#cson
+#
+#*********Special Thanks to Steven https://github.com/SBrinkworth for helping me revamp my snippets!!********
+#
+# ==================$q promise on the service ==============
+'.source.js':
+  '$q Svc':
+    'prefix': 'promQSvc'
+    'body': """
+               this.${1:svcGetData} = function() {
+                  var deferred = $q.defer();
+
+                  $http({
+                     method: '${2:GET}',
+                     url: '${3:http://}'
+                  }).then(function(response) {
+                     // console.log(response);
+                     deferred.resolve(response.${4:data}.${5:results})
+                  })
+                  return deferred.promise;
+               };
+            """
+# ==================$http promise on the service ===========
+  '$http Svc':
+    'prefix': 'promHttpSvc'
+    'body': """
+             this.${1:svcGetData} = function() {
+               return $http({
+                  method: 'GET',
+                  url: '${2:http://}'
+                  }).then(function(res) {
+                     return res.${3:data}.${4:results}
+                     })
+                     };
+            """
+# ==================promise on the controller (same for both $q and $http svc promises assuming .then is on the service) ==========
+  '$q/$http Ctrl':
+    'prefix': 'promCtrl'
+    'body': """
+             $scope.${1:ctrlGetData} = function() {
+                ${2:mainSvc}.${3:svcGetData()}.then(function(res) {
+                   $scope.dataOnView = res;
+                   // console.log(res);
+                })
+             }
+             $scope.ctrlGetData();
+            """
+# ==================Promise Notes ==========================
+   'Promise Notes':
+     'prefix': 'promNotes'
+     'body': """
+            //============================== $http .then on the Controller =================================
+                  //=====Service=====
+                     // this.test1 = function() {
+                     //    return $http({
+                     //       method: 'GET',
+                     //       url: 'http://swapi.co/api/people'
+                     //    })
+                     // };
+                  //=====Controller=====
+                     // $scope.getPeople = function() {
+                     //    mainSrvc.test1().then(function(res) {
+                     //       $scope.people = res.data.results
+                     //    })
+                     // }
+                     // $scope.getPeople();
+
+            //==================================== $http and .then on the Service ==============================
+                  //=====Service=====
+                     // this.test1 = function() {
+                     //    return $http({
+                     //       method: 'GET',
+                     //       url: 'http://swapi.co/api/people'
+                     //    }).then(function(res) {
+                     //       return res.data.results
+                     //    })
+                     // };
+                  //=====Controller=====
+                     // $scope.getPeople = function() {
+                     //    mainSrvc.test1().then(function(res) {
+                     //          $scope.people = res
+                     //       })
+                     //    }
+                     // $scope.getPeople();
+
+            //============================== $q ==================================================================
+                  //=====Service=====
+                     // this.test1 = function() {
+                     //    var deferred = $q.defer();
+                     //
+                     //    $http({
+                     //       method: 'GET',
+                     //       url: 'http://swapi.co/api/people'
+                     //    }).then(function(response) {
+                     //       // console.log(response);
+                     //       deferred.resolve(response.data.results)
+                     //    })
+                     //    return deferred.promise;
+                     // };
+                  //=====Controller=====
+                     // $scope.getPeople = function() {
+                     //    mainSrvc.test1().then(function(res) {
+                     //       $scope.people = res;
+                     //       // console.log(res);
+                     //    })
+                     // }
+                     // $scope.getPeople();
+                   """
+# ==================Angular Setup ======================================================================
+#=====App=====
+  'app':
+    'prefix': 'angapp'
+    'body': """
+            // INITILIZE APP
+            // ============================================================
+            var app = angular.module("${1:app}", [$2]);
+            $3
+            """
+#=====Controller=====
+  'controller':
+    'prefix': 'angctrl'
+    'body': """
+            // INITILIZE CONTROLLER
+            // ============================================================
+            ${2:angular.module("${1:app}")}.controller("${3:main}Ctrl", function($scope) {
+              // VARIABLES
+              // ============================================================
+              $4
+              // FUNCTIONS
+              // ============================================================
+            });
+            """
+#=====Service=====
+  'service':
+    'prefix': 'angsvc'
+    'body': """
+            // INITILIZE SERVICE
+            // ============================================================
+            ${2:angular.module("${1:app}")}.service("${3:collection}Service", function($http) {
+              // CRUD FUNCTIONS
+              // ============================================================
+              this.get${4:Collection} = function(id) {
+                var query = "";
+                if (id) query = '?_id=' + id;
+                return $http({
+                  method: 'GET',
+                  url: '/${5:collection}' + query
+                }).then(function(response) {
+                  if (response.data.length < 2) return response.data[0];
+                  return response.data;
+                });
+              };
+              this.create${4:Collection} = function(${6:collection}) {
+                return $http({
+                  method: 'POST',
+                  url: '/${5:collection}',
+                  data: ${6:collection}
+                }).then(function(response) {
+                  return response;
+                });
+              };
+              this.edit${4:Collection} = function(id, ${6:collection}) {
+                return $http({
+                  method: 'PUT',
+                  url: "/${5:collection}/" + id,
+                  data: ${6:collection}
+                }).then(function(response) {
+                  return response;
+                });
+              };
+              this.delete${4:Collection} = function(id) {
+                return $http({
+                  method: 'DELETE',
+                  url: '/${5:collection}/' + id
+                }).then(function(response) {
+                  return response;
+                });
+              };
+              // OTHER FUNCTIONS
+              // ============================================================
+              $7
+            });
+            """
+#=====Auth Service=====
+  'authService':
+    'prefix': 'angauthSvc'
+    'body': """
+            // INITILIZE SERVICE
+            // ============================================================
+            ${2:angular.module("${1:app}")}.service("authService", function($http) {
+              // AUTH FUNCTIONS
+              // ============================================================
+              this.login = function(user) {
+                return $http({
+                  method: 'post',
+                  url: '/login',
+                  data: user
+                }).then(function(response) {
+                  return response;
+                });
+              };
+              this.logout = function() {
+                return $http({
+                  method: 'get',
+                  url: '/logout'
+                }).then(function(response) {
+                  return response;
+                });
+              };
+              this.getCurrentUser = function() {
+                return $http({
+                  method: 'GET',
+                  url: '/me'
+                }).then(function(response) {
+                  return response;
+                });
+              };
+              this.registerUser = function(user) {
+                return $http({
+                  method: 'POST',
+                  url: '/register',
+                  data: user
+                }).then(function(response) {
+                  return response;
+                });
+              };
+              this.editUser = function(id, user) {
+                return $http({
+                  method: 'PUT',
+                  url: "/user/" + id,
+                  data: user
+                }).then(function(response) {
+                  return response;
+                });
+              };
+              // OTHER FUNCTIONS
+              // ============================================================
+              $3
+            });
+            """
+#=====Router=====
+  'Route/s config':
+    'prefix': 'angrouter'
+    'body': """
+              // CONFIG
+              // ============================================================
+              ${2:angular.module("${1:app}")}.config(function($stateProvider, $urlRouterProvider) {
+                // INITILIZE STATES
+                // ============================================================
+                $stateProvider
+                  // ${3:HOME} STATE
+                  .state('${4:home}', {
+                    url: '/${5:${4:home}}',
+                    templateUrl: './app/routes/${6:${4:home}}/${7:${4:home}}Tmpl.html',
+                    controller: '${8:${4:home}}Ctrl'
+                  })${9:;}
+                  $10
+                // ASSIGN OTHERWISE
+                // ============================================================
+                $urlRouterProvider.otherwise('/${4:home}');
+              });
+            """
+#=====Router Additional States=====
+  'Additional state':
+    'prefix': 'angrouterstate'
+    'body': """
+            // ${1:HOME} STATE
+            .state('${2:home}', {
+              url: '/${3:${2:home}}',
+              templateUrl: './app/routes/${4:${2:home}}/${5:${2:home}}Tmpl.html',
+              controller: '${6:${2:home}}Ctrl'
+            })${7:;}
+            $8
+            """
+#=====Router Notes=====
+  'Router HTML Notes':
+    'prefix': 'angrouterNotes'
+    'body': """
+            //======HTML SIDE=====
+            //<a ui-sref="home">Home</a>
+            //<a ui-sref="about">About</a>
+            //<a ui-sref="contact">Contact</a>
+            //<ui-view></ui-view>
+            //
+            //<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.18/angular-ui-router.js" charset="utf-8"></script>
+            //
+
+            //Notes:
+            //(ui-sref="##" links to .state('##'))
+            //router must be on same angular.module('app') that is enabled on index.html ng-app = "app"
+            //<ui-view></ui-view> may be contained in ng-controller on main index.html and still have
+            //templateUrl file location is from the index.html location
+            //controller name needs no file location, it is connected through the angular app
+            //====================
+            """
+#=====Directive=====
+  'directive':
+    'prefix': 'angdir'
+    'body': """
+            // INITILIZE DIRECTIVE
+            // ============================================================
+            ${2:angular.module("${1:app}")}.directive('${3:some}Dir', function() {
+              return {
+                restrict: '${4:EA}',
+                templateUrl: './app/directives/${5:${3:some}}/${6:${3:some}}Tmpl.html',
+                controller: '${7:${3:some}}Ctrl'//,
+                //link: function(scope, element, attribute) {},
+                // scope: {templHtmlName: '=passToDirName'}
+              };
+            });
+            $8
+            """
+#=====MISC=====
+  'console.log':
+    'prefix': 'con'
+    'body': """
+            console.log($1);
+            $2
+            """
+  '.then':
+    'prefix': 'then'
+    'body': """
+            .then(function(response) {
+              $1
+            });
+            """
+  '.catch':
+    'prefix': 'catch'
+    'body': """
+            .catch(function(err) {
+              $1
+            });
+            """
+
+# =============== JQuery ================================================================
+#==========jQuery.js============
+  'jQuery Setup':
+    'prefix': 'jqSetup'
+    'body': """
+            $(document).ready(function(){
+
+            });
+            //link src jQuery CDN and .js file at bottom of html
+            """
+
+# ==================Server Setup ======================================================================
+
+  'Server':
+    'prefix': 'server'
+    'body': """
+            // REQUIRE DEPENDENCIES
+            // ============================================================
+            var express = require('express');
+            var cors = require('cors');
+            var bodyParser = require('body-parser');
+            var mongoose = require('mongoose');
+            // CONTROLLERS
+            // ============================================================
+            var ${1:model}Ctrl = require('./controllers/${1:model}Ctrl');
+            // INITILIZE APP
+            // ============================================================
+            var app = express();
+            // INITILIZE DEPENDENCIES
+            // ============================================================
+            app.use(cors());
+            app.use(bodyParser.json());
+            // ENDPOINTS
+            // ============================================================
+            // ${2:MODEL} ENDPOINTS
+            app.get('/${3:model}', ${1:model}Ctrl.read);
+            app.post('/${3:model}', ${1:model}Ctrl.create);
+            app.put('/${3:model}/:id', ${1:model}Ctrl.update);
+            app.delete('/${3:model}/:id', ${1:model}Ctrl.delete);
+            // VARIABLES
+            // ============================================================
+            var port = ${4:3000};
+            var mongoURI = 'mongodb://localhost:27017/${3:DBName}';
+            // MONGO CONNECTION
+            // ============================================================
+            mongoose.set('debug', true);
+            mongoose.connect(mongoURI);
+            mongoose.connection.once('open', function() {
+              console.log('Connected to mongo at: ', mongoURI);
+            });
+            // LISTEN
+            // ============================================================
+            app.listen(port, function() {
+              console.log('listening on port ', port);
+            });
+            """
+
+
+
+  'Endpoints':
+    'prefix': 'end'
+    'body': """
+            // ${1:MODEL} ENDPOINTS
+            app.get('/${2:model}', ${3:model}Ctrl.read);
+            app.post('/${2:model}', ${3:model}Ctrl.create);
+            app.put('/${2:model}/:id', ${3:model}Ctrl.update);
+            app.delete('/${2:model}/:id', ${3:model}Ctrl.delete);
+            $4
+            """
+
+
+
+  'Server Controller':
+    'prefix': 'sctrl'
+    'body': """
+            // REQUIRE DEPENDENCIES
+            // ============================================================
+            var ${1:Model} = require('./../models/${1:Model}');
+            // EXPORT METHODS
+            // ============================================================
+            module.exports = {
+              // CRUD METHODS
+              // ============================================================
+              read: function(req, res) {
+                ${1:Model}.find(req.query, function(err, ${2:result}) {
+                  if (err) {
+                    res.status(500).send(err);
+                  }
+                  res.status(200).send(${2:result});
+                });
+              },
+              create: function(req, res) {
+                ${1:Model}.create(req.body, function(err, ${2:result}) {
+                  if (err) {
+                    res.status(500).send(err);
+                  }
+                  res.status(200).send(${2:result});
+                });
+              },
+              update: function(req, res) {
+                ${1:Model}.findByIdAndUpdate(req.params.id, req.body, function(err, ${2:result}) {
+                  if (err) {
+                    res.status(500).send(err);
+                  }
+                  res.status(200).send(${2:result});
+                });
+              },
+              delete: function(req, res) {
+                ${1:Model}.findByIdAndRemove(req.params.id, function(err, ${2:result}) {
+                  if (err) {
+                    res.status(500).send(err);
+                  }
+                  res.status(200).send(${2:result});
+                });
+              }
+              // OTHER METHODS
+              // ============================================================
+              $3
+            };
+            """
+
+
+
+  'Schema':
+    'prefix': 'schema'
+    'body': """
+            // REQUIRE DEPENDENCIES
+            // ============================================================
+            var mongoose = require('mongoose');
+            // DEFINE SCHEMA
+            // ============================================================
+            var ${1:model}Schema = mongoose.Schema({
+              $3
+            });
+            // EXPORT SCHEMA
+            // ============================================================
+            module.exports = mongoose.model('${2:Model}', ${1:model}Schema);
+            """
+
+
+
+
+
+# =============== MongoDB ================================================================
+#========== MongoDB Setup ============
+  'Mongo Setup':
+    'prefix': 'mongoDB'
+    'body': """
+            var mongojs = require('mongojs');
+            var db = mongojs("${1:fun-1}");
+            var ${2:mycollectionName}Coll = db.collection('${2:collectionName}')
+            """
+#========== INSERT ============
+  'Mongo Insert':
+    'prefix': 'mongoInsert'
+    'body': """
+            //Insert
+            collection.insert(${1:req.body}, function(err, ${2:collection}) {
+               console.log(${2:})
+               });
+            """
+#========== FIND ============
+  'Mongo Find':
+    'prefix': 'mongoFind'
+    'body': """
+            //Find
+            collection.find(${1:}, function(err, ${2:}) {
+               console.log(${2:});
+               });
+            """
+#========== FINDIN ============
+  'Mongo Find In':
+    'prefix': 'mongoFindIn'
+    'body': """
+            //Find
+            collection.find(${1:{username: {$in: [${3:doc1}, ${4:doc2}]}}}, function(err, ${2:}) {
+               console.log(${2:});
+               });
+            """
+#========== FINDONE ============
+  'Mongo Find One':
+    'prefix': 'mongoFindOne'
+    'body': """
+            //Find
+            collection.findOne({_id:"a;lsdkfj"}, function(err, ${2:}) {
+               console.log(${2:});
+               });
+            """
+# =============== HTML ================================================================
+#=====HTML setup=====
+# '.text.html, .text.html .meta.scope.between-tag-pair, .text.html .punctuation.tag.begin':
+  'ng-html':
+    'prefix': 'nghtml'
+    'body': """
+            <!DOCTYPE html>
+            <html ng-app="${1:app}">
+              <head>
+                <meta charset="utf-8">
+                <title>$2</title>
+                <link rel="stylesheet" href="styles/style.css">
+              </head>
+              <body ng-controller="${3:mainCtrl}">
+                $4
+                <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.js"></script>
+                <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-route.js"></script>
+                <script src="app/app.js"></script>
+                <script src="app/controllers/mainCtrl.js"></script>
+                <script src="app/services/mainService.js"></script>
+              </body>
+            </html>
+            """
+#=====modal template=====
+  'modal template':
+    'prefix': 'modal'
+    'body': """
+            <!-- MODAL TEMPLATE -->
+            <div class="overlay">
+            </div>
+            <div class="fade" ${1:ng-click="close()"}></div>
+            """
+#=====ng-repeat=====
+  'ng-repeat':
+    'prefix': 'ngrep'
+    'body': """
+            <div ng-repeat="${1:obj} in $1s">
+            </div>
+            """
+#=====ng-view=====
+  'ng-view':
+    'prefix': 'ngview'
+    'body': """
+            <ng-view ></ng-view>
+            """
+  'Input text':
+    'prefix': 'input'
+    'body': """
+            <input type="${1:text}" name="${2:name}" value="" placeholder="${2:EnterTextHere}">
+            """
+  'ui-view':
+    'prefix': 'uiview'
+    'body': """
+            <ui-view ></ui-view>
+            """
+  'ng-repeat':
+    'prefix': 'rep'
+    'body': """
+            <div ng-repeat="${1:obj} in $1s">
+            </div>
+            """
+  'ng-view':
+    'prefix': 'ngview'
+    'body': """
+            <ng-view ></ng-view>
+            """
+
+
+  'console.log':
+    'prefix': 'con'
+    'body': """
+            console.log($1);
+            """
+
+# =============== CSS ================================================================
+ # '.source.css':
+ #  'css skeleton':
+ #    'prefix': 'reset'
+ #    'body': """
+ #      html, body, div, span, applet, object, iframe,
+ #      h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+ #      a, abbr, acronym, address, big, cite, code,
+ #      del, dfn, em, img, ins, kbd, q, s, samp,
+ #      small, strike, strong, sub, sup, tt, var,
+ #      b, u, i, center,
+ #      dl, dt, dd, ol, ul, li,
+ #      fieldset, form, label, legend,
+ #      table, caption, tbody, tfoot, thead, tr, th, td,
+ #      article, aside, canvas, details, embed,
+ #      figure, figcaption, footer, header, hgroup,
+ #      menu, nav, output, ruby, section, summary,
+ #      time, mark, audio, video {
+ #          margin: 0;
+ #          padding: 0;
+ #          border: 0;
+ #          font-size: 100%;
+ #          font: inherit;
+ #          vertical-align: baseline;
+ #          box-sizing: border-box;
+ #      }
+ #      /* HTML5 display-role reset for older browsers */
+ #      article, aside, details, figcaption, figure,
+ #      footer, header, hgroup, menu, nav, section {
+ #          display: block;
+ #      }
+ #      body {
+ #          line-height: 1;
+ #      }
+ #      ol, ul {
+ #          list-style: none;
+ #      }
+ #      blockquote, q {
+ #          quotes: none;
+ #      }
+ #      blockquote:before, blockquote:after,
+ #      q:before, q:after {
+ #          content: '';
+ #          content: none;
+ #      }
+ #      table {
+ #          border-collapse: collapse;
+ #          border-spacing: 0;
+ #      }
+ #      """
+'.source.css':
+  'modal classes':
+    'prefix': 'modal'
+    'body': """
+            // MODAL OVERLAY
+            // ============================================================
+            .overlay {
+              color: black;
+              position: fixed
+              top: 50%
+              left: 50%
+              transform: translate(-50%, -50%)
+              padding: 25px;
+              background-color: #ffffff;
+              z-index: 100;
+              overflow: auto;
+              border-radius: 3px;
+              border: 1px solid #C0C3C5;
+            }
+            // MODAL FADE
+            // ============================================================
+            .fade {
+              position: fixed;
+              left: 0%;
+              top: 0%;
+              background-color: black;
+              -moz-opacity: 0.7;
+              opacity: .70;
+              filter: alpha(opacity=70);
+              width: 100%;
+              height: 100%;
+              z-index: 99;
+            }
+            """
+  # REACT SNIPPETS
+  # ============================================================
+  'React':
+    'prefix': 'react'
+    'body': """
+            import React, {Component} from 'react';
+            export default class App extends Component {
+              constructor(props){
+                super(props);
+                this.state = {};
+              }
+              render() {
+                return(
+                  <div>
+                  </div>
+                );
+              }
+            }
+            """
+  'Div':
+    'prefix': 'div'
+    'body': """
+            <div className="$1">
+              $2
+            </div>
+            """
+  'Input':
+    'prefix': 'input'
+    'body': """
+            <input className="$1" type="${2:text}" placeholder="$3" onChange={ (event) => this.${1:functionName}(event.target.value)} />
+            $4
+            """
+  'Button':
+    'prefix': 'button'
+    'body': """
+            <button className="$1" type="button" onClick={}>$2</button>
+            $3
+            """
+  'Header':
+    'prefix': 'h1'
+    'body': """
+            <h${1:1} className="$2">$3</h${1:1}>
+            $4
+            """
+  'Link':
+    'prefix': 'a'
+    'body': """
+            <a href="$1">$2</a>
+            $3
+            """
+  'Image':
+    'prefix': 'img'
+    'body': """
+            <img src="$1">$2</img>
+            $3
+            """
+  'Peragraph':
+    'prefix': 'p'
+    'body': """
+            <p className="$1">$2</p>
+            $3
+            """
+  'Select':
+    'prefix': 'select'
+    'body': """
+            <select onChange={ (event) => this.${1:functionName}(event.target.value)}>
+              <option value="$2">$3</option>
+            </select>
+            $4
+            """
+  # GULP SNIPPET
+  # ============================================================
+  'gulpfile':
+    'prefix': 'gulp'
+    'body': """
+            // REQUIRE DEPENDENCIES
+            // ============================================================
+            var gulp = require('gulp');
+            var concat = require('gulp-concat');
+            var annotate = require('gulp-ng-annotate');
+            var uglify = require('gulp-uglify');
+            var watch = require('gulp-watch');
+            var sass = require('gulp-sass');
+            var babel = require('gulp-babel');
+            // DECLARE FILE PATHS
+            // ============================================================
+            var paths = {
+              jsSource: ['./public/app/**/*.js', '!/public/bundle.js'],
+              sassSource: ['./public/${1:app}/**/*.sass']
+            };
+            // DEFINE TASKS
+            // ============================================================
+            gulp.task('js', function() {
+              return gulp.src(paths.jsSource)
+              //.pipe(babel()) //Uncomment if using ES6
+              .pipe(concat('bundle.js'))
+              .pipe(annotate())
+              //.pipe(uglify()) //Uncomment when code is production ready
+              .pipe(gulp.dest('./public'));
+            });
+            gulp.task('sass', function () {
+              return gulp.src(paths.sassSource)
+                .pipe(sass())
+                .pipe(concat('style.css'))
+                .pipe(gulp.dest('./public'));
+            });
+            $2
+            // WATCH TASKS
+            // ============================================================
+            gulp.task('watch', function() {
+              gulp.watch(paths.jsSource, ['js']);
+              gulp.watch(paths.sassSource, ['sass']);
+            });
+            // RUN DEFAULT TASK - first thing to run when gulp is called
+            // ============================================================
+            gulp.task('default', ['watch', 'js', 'sass']);
+            """
